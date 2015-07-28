@@ -170,6 +170,10 @@
         var player = this.settings.createPlayer;
         container[audiojs].helpers.removeClass(this.wrapper, player.playingClass);
       },
+      stop: function() {
+        var player = this.settings.createPlayer;
+        container[audiojs].helpers.removeClass(this.wrapper, player.playingClass);
+      },
       updatePlayhead: function(percent) {
         var player = this.settings.createPlayer,
             progress = getByClass(player.progressClass, this.wrapper);
@@ -282,6 +286,7 @@
       if (!audio.settings.createPlayer) return;
       var player = audio.settings.createPlayer,
           playPause = getByClass(player.playPauseClass, wrapper),
+          stop = getByClass(player.stopClass, wrapper),
           scrubber = getByClass(player.scrubberClass, wrapper),
           leftPos = function(elem) {
             var curleft = 0;
@@ -293,6 +298,10 @@
 
       container[audiojs].events.addListener(playPause, 'click', function(e) {
         audio.playPause.apply(audio);
+      });
+
+      container[audiojs].events.addListener(stop, 'click', function(e) {
+        audio.stop.apply(audio);
       });
 
       container[audiojs].events.addListener(scrubber, 'click', function(e) {
@@ -663,6 +672,12 @@
     pause: function() {
       this.playing = false;
       this.element.pause();
+      this.settings.pause.apply(this);
+    },
+    stop: function() {
+      this.playing = false;
+      this.element.pause();
+      this.element.currentTime = 0;
       this.settings.pause.apply(this);
     },
     setVolume: function(v) {
