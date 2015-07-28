@@ -284,9 +284,12 @@
     // Attaches useful event callbacks to an `audiojs` instance.
     attachEvents: function(wrapper, audio) {
       if (!audio.settings.createPlayer) return;
-      var player = audio.settings.createPlayer,
+      var repeater = null,
+          player = audio.settings.createPlayer,
           playPause = getByClass(player.playPauseClass, wrapper),
           stop = getByClass(player.stopClass, wrapper),
+          rewind = getByClass(player.rewindClass, wrapper),
+          forward = getByClass(player.forwardClass, wrapper),
           scrubber = getByClass(player.scrubberClass, wrapper),
           leftPos = function(elem) {
             var curleft = 0;
@@ -302,6 +305,36 @@
 
       container[audiojs].events.addListener(stop, 'click', function(e) {
         audio.stop.apply(audio);
+      });
+
+      container[audiojs].events.addListener(rewind, 'mousedown', function(e) {
+        audio.rewind.apply(audio);
+        repeater = setInterval(function () {
+          audio.rewind.apply(audio);
+        }, 200);
+      });
+
+      container[audiojs].events.addListener(rewind, 'mouseup', function(e) {
+        clearInterval(repeater);
+      });
+
+      container[audiojs].events.addListener(rewind, 'mouseout', function(e) {
+        clearInterval(repeater);
+      });
+
+      container[audiojs].events.addListener(forward, 'mousedown', function(e) {
+        audio.forward.apply(audio);
+        repeater = setInterval(function () {
+          audio.forward.apply(audio);
+        }, 200);
+      });
+
+      container[audiojs].events.addListener(forward, 'mouseup', function(e) {
+        clearInterval(repeater);
+      });
+
+      container[audiojs].events.addListener(forward, 'mouseout', function(e) {
+        clearInterval(repeater);
       });
 
       container[audiojs].events.addListener(scrubber, 'click', function(e) {
@@ -679,6 +712,12 @@
       this.element.pause();
       this.element.currentTime = 0;
       this.settings.pause.apply(this);
+    },
+    rewind: function() {
+      this.element.currentTime -= 5;
+    },
+    forward: function() {
+      this.element.currentTime += 5;
     },
     setVolume: function(v) {
       this.element.volume = v;
