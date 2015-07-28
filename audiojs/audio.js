@@ -31,6 +31,7 @@
     // ### The main settings object
     // Where all the default settings are stored. Each of these variables and methods can be overwritten by the user-provided `options` object.
     settings: {
+      multiplay: true,
       autoplay: false,
       loop: false,
       preload: true,
@@ -684,6 +685,13 @@
       }
     },
     playPause: function() {
+      if (!this.settings.multiplay) {
+        for (var key in container[audiojs].instances) {
+          var instance = container[audiojs].instances[key];
+          if (instance == this) continue;
+          if (instance.playing) instance.pause();
+        }
+      }
       if (this.playing) this.pause();
       else this.play();
     },
@@ -708,6 +716,13 @@
       this.settings.pause.apply(this);
     },
     stop: function() {
+      if (!this.settings.multiplay) {
+        for (var key in container[audiojs].instances) {
+          var instance = container[audiojs].instances[key];
+          if (instance == this) continue;
+          if (instance.playing) instance.pause();
+        }
+      }
       this.playing = false;
       this.element.pause();
       this.element.currentTime = 0;
