@@ -229,6 +229,7 @@
       if (element.getAttribute('autoplay') != null) s.autoplay = true;
       if (element.getAttribute('loop') != null) s.loop = true;
       if (element.getAttribute('preload') == 'none') s.preload = false;
+
       // Merge the default settings with the user-defined `options`.
       if (options) this.helpers.merge(s, options);
 
@@ -701,7 +702,8 @@
       if (ios && this.element.readyState == 0) this.init.apply(this);
       // If the audio hasn't started preloading, then start it now.  
       // Then set `preload` to `true`, so that any tracks loaded in subsequently are loaded straight away.
-      if (!this.settings.preload) {
+      // This is also a fix for handling preload="metadata"
+      if (!this.settings.preload || this.element.getAttribute('preload') == 'metadata') {
         this.settings.preload = true;
         this.element.setAttribute('preload', 'auto');
         container[audiojs].events.trackLoadProgress(this);
