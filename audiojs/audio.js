@@ -408,6 +408,17 @@
         audio.element.ppause();
         audio.settings.pause.apply(audio);
       }
+      audio['stop'] = function() {
+        audio.playing = false;
+        audio.element.stop();
+        audio.settings.pause.apply(audio);
+      }
+      audio['rewind'] = function() {
+        audio.element.rewind();
+      }
+      audio['forward'] = function() {
+        audio.element.forward();
+      }
       audio['setVolume'] = function(v) {
         audio.element.setVolume(v);
       }

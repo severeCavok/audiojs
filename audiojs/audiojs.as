@@ -1,18 +1,17 @@
 package {
 
 import flash.display.Sprite;
-import flash.external.ExternalInterface;
-import flash.net.URLRequest;
-import flash.media.Sound;
-import flash.media.SoundChannel;
-import flash.media.SoundTransform;
 import flash.events.Event;
-import flash.errors.IOError;
 import flash.events.IOErrorEvent;
 import flash.events.ProgressEvent;
 import flash.events.TimerEvent;
-import flash.utils.Timer;
+import flash.external.ExternalInterface;
+import flash.media.Sound;
+import flash.media.SoundChannel;
+import flash.media.SoundTransform;
+import flash.net.URLRequest;
 import flash.system.Security;
+import flash.utils.Timer;
 
 public class audiojs extends Sprite {
 
@@ -46,6 +45,9 @@ public class audiojs extends Sprite {
     ExternalInterface.addCallback('playPause', playPause);
     ExternalInterface.addCallback('pplay', play);
     ExternalInterface.addCallback('ppause', pause);
+    ExternalInterface.addCallback('stop', stop);
+    ExternalInterface.addCallback('rewind', rewind);
+    ExternalInterface.addCallback('forward', forward);
     ExternalInterface.addCallback('skipTo', skipTo);
     ExternalInterface.addCallback('setVolume', setVolume);
 
@@ -57,7 +59,7 @@ public class audiojs extends Sprite {
     var playProgress:Number = targetPosition / this.duration;
 
     if (playProgress > 1) playProgress = 1;
-    if (playProgress > 0) {
+    if (playProgress >= 0) {
       ExternalInterface.call(this.playerInstance+'updatePlayhead', playProgress);
     }
   }
@@ -117,6 +119,26 @@ public class audiojs extends Sprite {
     }
   }
 
+  private function stop():void {
+    this.pausePoint = 0;
+    this.channel.stop();
+    this.playing = false;
+    this.updatePlayhead();
+    this.timer.stop();
+  }
+  
+  private function rewind():void {
+    var percent:Number = (this.pausePoint - 5000) / this.duration;
+    this.skipTo(percent);
+    this.updatePlayhead();
+  }
+  
+  private function forward():void {
+    var percent:Number = (this.pausePoint + 5000) / this.duration;
+    this.skipTo(percent);
+    this.updatePlayhead();
+  }
+  
   private function skipTo(percent:Number):void {
     this.channel.stop();
     this.pausePoint = this.duration * percent;
